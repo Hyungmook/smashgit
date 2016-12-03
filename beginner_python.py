@@ -189,43 +189,34 @@ while running == True:
             brick.rect = brick.rect.move([wall_speed_x, -wall_speed_y])
             if brick.rect.left < 0 or brick.rect.right > width:
                 wall_speed_x = -wall_speed_x
-            if brick.rect.top < 0 or brick.rect.bottom > 600:
+            if brick.rect.top < 0 or brick.rect.bottom > 450:
                 wall_speed_y = -wall_speed_y
         screen.blit(A_label, (40, 10))
 
     if score >= 60 and score < 65:
         screen.blit(C_label, (40, 10))
 
-    if score >= 65 and score < 70:
+    if score >= 65:
+        limit = 2000
         ball_speed_y = 6
         ball_speed_x = 6
-        # if ball_rect.top < 0 or ball_rect.bottom > height:
-        #     ball_speed_y = -ball_speed_y
-        # if ball_rect.left < 0 or ball_rect.right > width:
-        #     ball_speed_x = -ball_speed_x
-        # if ball_rect.colliderect(hand.rect):
-        #     ball_speed_y = -ball_speed_y
-        # for brick in brick_array:
-        #     if brick.rect.colliderect(ball_rect):
-        #         if ball_rect.top < brick.rect.bottom or ball_rect.bottom > brick.rect.top:
-        #             ball_speed_y = - ball_speed_y
-        #         elif ball_rect.left < brick.rect.right or ball_rect.right > brick.rect.left:
-        #             ball_speed_x = - ball_speed_x
-        #         score = score + 1
-        #         brick_array.remove(brick)
+        if ball_rect.top < 0 or ball_rect.bottom > height:
+            ball_speed_y = -ball_speed_y
+        if ball_rect.left < 0 or ball_rect.right > width:
+            ball_speed_x = -ball_speed_x
+        if ball_rect.colliderect(hand.rect):
+            ball_speed_y = -ball_speed_y
+        for brick in brick_array:
+            if brick.rect.colliderect(ball_rect):
+                if ball_rect.top < brick.rect.bottom or ball_rect.bottom > brick.rect.top:
+                    ball_speed_y = - ball_speed_y
+                elif ball_rect.left < brick.rect.right or ball_rect.right > brick.rect.left:
+                    ball_speed_x = - ball_speed_x
+                score = score + 1
+                brick_array.remove(brick)
         screen.blit(Twist_label, (500, 0))
         if ball_rect.bottom == height:
-                running = False
-
-
-    # if game_over:
-    #     myfont = pygame.font.SysFont("monospace", 50)
-    #     label = myfont.render("Game over!", 1, (255,255,0))
-    #     screen.blit(label, (300, 320))
-    #     if credits_timer > 0:
-    #         credits_timer -= 1
-    #     else:
-    #         break
+            running = False
 
     "Labels"
     secret = myfont.render("Did you catch that?", 1, pygame.color.THECOLORS['white'])
