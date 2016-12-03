@@ -47,12 +47,6 @@ ball_speed_x = 5
 ball_speed_y = 5
 
 "THE PADDLE"
-# paddle_x = 20
-# paddle_y = 450
-# paddle_width = 60
-# paddle_height = 20
-# paddle_color = [20,180,180]
-# paddle_speed = 10
 hand = MasterHand(everything)
 x_delta = 0
 y_delta = 0
@@ -88,10 +82,22 @@ pygame.key.set_repeat(20, 20)
 
 credits_timer = 250
 
+theme = "hohversion/3-26-battle-champion-.mp3"
+theme2 = "hohversion/092 Lavender Town.mp3"
+pygame.mixer.pre_init(44100, -16, 2, 2048)
+
+
+while pygame.mixer.music.get_busy():
+    pygame.time.Clock().tick(10)
+pygame.mixer.music.load(theme)
+# pygame.mixer.music.play(loops = 5, start = 0.0)
+pygame.mixer.music.play(-1) 
+
+
 running = True
+game_over = False
 #game loop
-while running:
-    game_over = False
+while running == True:
     for event in pygame.event.get():
         #check if you've exited the game
         if event.type == pygame.QUIT:
@@ -121,9 +127,9 @@ while running:
             hand.rect = hand.rect.move([hand.handx, 0])
             hand.handx = 0
 
-        
-            
 
+
+            
 
     #pause for 20 milliseconds
     pygame.time.delay(20)
@@ -141,11 +147,12 @@ while running:
 
 
     "I wanted to make a game_over"
-    # if ball_rect.bottom == height:
-    #     game_over = True
+    if ball_rect.bottom == height:
+        running = False
 
     if ball_rect.colliderect(hand.rect):
         ball_speed_y = -ball_speed_y
+        pygame.mixer.Sound("hohversion/SSBB_Grab.wav").play()
 
 
     for brick in brick_array:
@@ -190,26 +197,26 @@ while running:
         screen.blit(C_label, (40, 10))
 
     if score >= 65 and score < 70:
-        ball_speed_y = 7
-        ball_speed_x = 7
-        if ball_rect.top < 0 or ball_rect.bottom > height:
-            ball_speed_y = -ball_speed_y
-        if ball_rect.left < 0 or ball_rect.right > width:
-            ball_speed_x = -ball_speed_x
-        if ball_rect.colliderect(hand.rect):
-            ball_speed_y = -ball_speed_y
-        for brick in brick_array:
-            if brick.rect.colliderect(ball_rect):
-                if ball_rect.top < brick.rect.bottom or ball_rect.bottom > brick.rect.top:
-                    ball_speed_y = - ball_speed_y
-                elif ball_rect.left < brick.rect.right or ball_rect.right > brick.rect.left:
-                    ball_speed_x = - ball_speed_x
-                score = score + 1
-                brick_array.remove(brick)
+        ball_speed_y = 6
+        ball_speed_x = 6
+        # if ball_rect.top < 0 or ball_rect.bottom > height:
+        #     ball_speed_y = -ball_speed_y
+        # if ball_rect.left < 0 or ball_rect.right > width:
+        #     ball_speed_x = -ball_speed_x
+        # if ball_rect.colliderect(hand.rect):
+        #     ball_speed_y = -ball_speed_y
+        # for brick in brick_array:
+        #     if brick.rect.colliderect(ball_rect):
+        #         if ball_rect.top < brick.rect.bottom or ball_rect.bottom > brick.rect.top:
+        #             ball_speed_y = - ball_speed_y
+        #         elif ball_rect.left < brick.rect.right or ball_rect.right > brick.rect.left:
+        #             ball_speed_x = - ball_speed_x
+        #         score = score + 1
+        #         brick_array.remove(brick)
         screen.blit(Twist_label, (500, 0))
+        if ball_rect.bottom == height:
+                running = False
 
-        # ball_speed_y += 1
-        # ball_speed_x += 1
 
     # if game_over:
     #     myfont = pygame.font.SysFont("monospace", 50)
@@ -241,6 +248,17 @@ while running:
     everything.draw(screen)
     pygame.display.flip()
 
+pygame.mixer.music.stop()
+pygame.mixer.music.load(theme2)
+pygame.mixer.music.play(-1)
 
-pygame.quit()
-
+while running == False:
+    go_label = myfont.render("Game over. Jk! Everyone's a winner at heart. Press TAB to quit", 1, pygame.color.THECOLORS['black'])
+    screen.fill(pygame.color.THECOLORS['white'])
+    screen.blit(go_label, (300, 350))
+    pygame.display.flip()
+    for event in pygame.event.get():
+        #check if you've exited the game
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_TAB:
+                pygame.quit()
