@@ -8,6 +8,16 @@ black = [0, 0, 0]
 
 everything = pygame.sprite.Group()
 
+class Background(pygame.sprite.Sprite):
+    def __init__(self, image_file, location):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(image_file).convert()
+        self.trans = self.image.get_at((0,0))
+        self.image.set_colorkey(self.trans)
+        self.rect = self.image.get_rect(center=(500,500))
+        self.rect.left, self.rect.top = location
+
+
 class MasterHand(pygame.sprite.Sprite):
     def __init__(self, hand):
         self.image = pygame.image.load('hohversion/handopen.png')
@@ -16,7 +26,6 @@ class MasterHand(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = (500, 750))
         
 
-
 class Brick(pygame.sprite.Sprite):
     image = None
 
@@ -24,7 +33,7 @@ class Brick(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         
         if Brick.image is None:
-                Brick.image = pygame.image.load("hohversion/brick.png")
+                Brick.image = pygame.image.load("hohversion/brick1.png")
         self.image = Brick.image
 
         # Make our top-left corner the passed-in location.
@@ -37,6 +46,9 @@ class Brick(pygame.sprite.Sprite):
  
 
 #the game's variables
+
+"BACKGROUND"
+background = Background('hohversion/thumbs_up.png', [200,0])
 
 "THE BALL"
 ball_x = 10
@@ -56,6 +68,11 @@ wall_speed_x = 2
 wall_speed_y = 2
 delta_wall_x = 0
 delta_wall_y = 0
+#Attempted to change the brick colors when reach certain point, but decided green is fine
+brick2 = pygame.image.load("hohversion/brick2.png")
+brick2_rect = brick2.get_rect()
+brick3 = pygame.image.load("hohversion/brick3.png")
+brick3_rect = brick3.get_rect()
 
 
 "THE BALL'S JUNK"
@@ -196,36 +213,30 @@ while running == True:
     if score >= 60 and score < 65:
         screen.blit(C_label, (40, 10))
 
-    if score >= 65:
-        limit = 2000
-        ball_speed_y = 6
-        ball_speed_x = 6
-        if ball_rect.top < 0 or ball_rect.bottom > height:
-            ball_speed_y = -ball_speed_y
-        if ball_rect.left < 0 or ball_rect.right > width:
-            ball_speed_x = -ball_speed_x
-        if ball_rect.colliderect(hand.rect):
-            ball_speed_y = -ball_speed_y
+    if score >= 65 and score < 75:
         for brick in brick_array:
-            if brick.rect.colliderect(ball_rect):
-                if ball_rect.top < brick.rect.bottom or ball_rect.bottom > brick.rect.top:
-                    ball_speed_y = - ball_speed_y
-                elif ball_rect.left < brick.rect.right or ball_rect.right > brick.rect.left:
-                    ball_speed_x = - ball_speed_x
-                score = score + 1
-                brick_array.remove(brick)
-        screen.blit(Twist_label, (500, 0))
-        if ball_rect.bottom == height:
-            running = False
+            brick.rect = brick.rect.move([wall_speed_x, -wall_speed_y])
+            if brick.rect.left < 0 or brick.rect.right > width:
+                wall_speed_x = -wall_speed_x
+            if brick.rect.top < 0 or brick.rect.bottom > 500:
+                wall_speed_y = -wall_speed_y
+        screen.blit(Twist_label, (40, 10))
+
+    if score >= 75:
+        screen.blit(AL_label, (40, 10))
+
+    if score == 92:
+        running = False
+        
 
     "Labels"
     secret = myfont.render("Did you catch that?", 1, pygame.color.THECOLORS['white'])
     score_label = myfont.render(str(score), 1, pygame.color.THECOLORS['white'])
     lb_label = myfont.render("Looking Good!", 1, pygame.color.THECOLORS['white'])
     A_label = myfont.render("Amazing!", 1, pygame.color.THECOLORS['white'])
-    everything.clear(screen, empty)
     C_label = myfont.render("Congratulations! You're basically done", 1, pygame.color.THECOLORS['white'])
     Twist_label = myfont.render("OR ARE YOU?", 1, pygame.color.THECOLORS['red'])
+    AL_label = myfont.render("Almost there! 92 to win!", 1, pygame.color.THECOLORS['white'])
 
 
     #draw everything on the screen
@@ -244,9 +255,12 @@ pygame.mixer.music.load(theme2)
 pygame.mixer.music.play(-1)
 
 while running == False:
-    go_label = myfont.render("Game over. Jk! Everyone's a winner at heart. Press TAB to quit", 1, pygame.color.THECOLORS['black'])
-    screen.fill(pygame.color.THECOLORS['white'])
-    screen.blit(go_label, (300, 350))
+    if score == 92:
+        pygame.mixer.Sound("hohversion/fanfare.wav").play()
+    screen.fill(black)
+    go_label = myfont.render("Game over! Either way, everyone's a winner at heart. Press TAB to quit", 1, pygame.color.THECOLORS['yellow'])
+    screen.blit(background.image, background.rect)
+    screen.blit(go_label, (40, 10))
     pygame.display.flip()
     for event in pygame.event.get():
         #check if you've exited the game
