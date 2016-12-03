@@ -3,22 +3,18 @@ import random
 pygame.init()
 size = width, height = 1000, 700
 screen = pygame.display.set_mode(size)
+empty = pygame.Surface(size)
 black = [0, 0, 0]
 
-HAND_X = 500
-HAND_Y = 400
+everything = pygame.sprite.Group()
 
 class MasterHand(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height):
-        super(MasterHand, self).__init__()
+    def __init__(self, hand):
         self.image = pygame.image.load('hohversion/handopen.png')
-        self.rect = self.image.get_rect(midbottom(100, 100))
-        self.x = x
-        self.y = y
-        self.handx = 15
-        self.handy = 15
-        self.width = width
-        self.height = height
+        self.handx = 0
+        self.handy = 0
+        self.rect = self.image.get_rect(midbottom = (500, 750))
+        
 
 
 class Brick(pygame.sprite.Sprite):
@@ -35,7 +31,9 @@ class Brick(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
-        self.rect.topleft = (self.x, self.y) 
+        self.rect.topleft = (self.x, self.y)
+
+
  
 
 #the game's variables
@@ -45,7 +43,7 @@ ball_x = 10
 ball_y = 10
 ball_radius = 10
 ball_color = [222,50,50]
-ball_speed_x = 3
+ball_speed_x = 5
 ball_speed_y = 5
 
 "THE PADDLE"
@@ -55,114 +53,192 @@ ball_speed_y = 5
 # paddle_height = 20
 # paddle_color = [20,180,180]
 # paddle_speed = 10
-hand = MasterHand(0, 0, 0, 0)
+hand = MasterHand(everything)
+x_delta = 0
+y_delta = 0
+
+"THE BRICKS"
+wall_speed_x = 2
+wall_speed_y = 2
+delta_wall_x = 0
+delta_wall_y = 0
+
 
 "THE BALL'S JUNK"
-ball_img = pygame.image.load('hohversion/smashball.png')
-
+ball_img = pygame.image.load('hohversion/smashball.png').convert()
+ball_trans = ball_img.get_at((0,0))
+ball_img.set_colorkey(ball_trans)
 ball_rect = ball_img.get_rect(center=(500,500))
 
-
+"FOR THE FONT SCORE"
 myfont = pygame.font.SysFont("Arial", 22)
 score = 0
 
 "MAKING THE BRICKS"
+ran = random.randint(45, 60)
 brick_array = []
-for i in range(1,30):
-    brick1 = Brick(50*i,10)
-    brick_array.append(brick1)
+for i in range(1,11):
+    for j in range(1, 11):
+        brick1 = Brick(90*i,40*j)
+        brick_array.append(brick1)
 
 
 #allows for holding of key
 pygame.key.set_repeat(20, 20)
 
-
+credits_timer = 250
 
 running = True
 #game loop
 while running:
+    game_over = False
     for event in pygame.event.get():
         #check if you've exited the game
         if event.type == pygame.QUIT:
             running = False
 
-        # if event.type == pygame.MOUSEMOTION:
-        #     coordinates = pygame.mouse.get_pos() #gives (x,y) coordinates
-        #     paddle_x = coordinates[0] - paddle_width/2 #sets the paddle_x variable to the first item in coordinates
-        #     if paddle_x < 0:
-        #         paddle_x = 0
-        #     if paddle_x > screen.get_width() - paddle_width:
-        #         paddle_x = screen.get_width() - paddle_width
-            
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-            #updatd x_delta and y_delta
-                x_delta = 0
-                y_delta = 0
-                x_delta -= 15
-            if event.key == pygame.K_RIGHT:
-                x_delta = 0
-                y_delta = 0
-                x_delta += 15
-            if event.key == pygame.K_UP:
-                x_delta = 0
-                y_delta = 0
-                y_delta -= 15
-            if event.key == pygame.K_DOWN:
-                x_delta = 0
-                y_delta = 0
-                y_delta += 15
-    
+          if event.key == pygame.K_LEFT:
+              #updatd x_delta and y_delta
+              x_delta = 0
+              y_delta = 0
+              x_delta -= 15
+          if event.key == pygame.K_RIGHT:
+              x_delta = 0
+              y_delta = 0
+              x_delta += 15
+            
+
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_LEFT]:
+            x_delta -=2
+            hand.handx += x_delta
+            hand.rect = hand.rect.move([hand.handx, 0])
+            hand.handx = 0
+        if keys_pressed[pygame.K_RIGHT]:
+            x_delta +=2
+            hand.handx += x_delta
+            hand.rect = hand.rect.move([hand.handx, 0])
+            hand.handx = 0
+
+        
+            
+
 
     #pause for 20 milliseconds
     pygame.time.delay(20)
     #make the screen completely white
     screen.fill(black)
     ball_rect = ball_rect.move([ball_speed_x, ball_speed_y])
+    
 
     #move the ball
-    ball_y = ball_y + ball_speed_y
-    ball_x = ball_x + ball_speed_x
-    #check if the ball is off the bottom of the screen
     if ball_rect.top < 0 or ball_rect.bottom > height:
         ball_speed_y = -ball_speed_y
-    # if ball_y > screen.get_height() - ball_radius:
-    #     ball_speed_y = -ball_speed_y
-    #     #do something different
-    # #check if the ball hit the top of the screen
-    # if ball_y < ball_radius:
-    #     ball_speed_y = -ball_speed_y
-    # #check if the ball hit the left side of the screen
+
     if ball_rect.left < 0 or ball_rect.right > width:
         ball_speed_x = -ball_speed_x
-    # if ball_x < ball_radius:
-    #     ball_speed_x = -ball_speed_x
-    # #check if the ball hit the right side of the screen
-    # if ball_x > screen.get_width() - ball_radius:
-    #     ball_speed_x = -ball_speed_x
 
-    #create imaginary rectangles around ball and paddle
-    #circles are measured from the center, so have to subtract 1 radius from the x and y
-    # paddle_rect = pygame.Rect(paddle_x, paddle_y, paddle_width, paddle_height)
-    #see if the rectangles overlap
-    if ball_rect.colliderect(paddle_rect):
+
+    "I wanted to make a game_over"
+    # if ball_rect.bottom == height:
+    #     game_over = True
+
+    if ball_rect.colliderect(hand.rect):
         ball_speed_y = -ball_speed_y
+
 
     for brick in brick_array:
         if brick.rect.colliderect(ball_rect):
+            if ball_rect.top < brick.rect.bottom or ball_rect.bottom > brick.rect.top:
+                ball_speed_y = - ball_speed_y
+            elif ball_rect.right > brick.rect.left or ball_rect.left < brick.rect.right:
+                ball_speed_x = - ball_speed_x
             score = score + 1
             brick_array.remove(brick)
-            ball_speed_y = - ball_speed_y
-    
+
+    if score == 10:
+        for brick in brick_array:
+            brick.rect = brick.rect.move([wall_speed_x, wall_speed_y])
+            if brick.rect.left < 0 or brick.rect.right > width:
+                wall_speed_x = -wall_speed_x
+            if brick.rect.top < 0 or brick.rect.bottom > 300:
+                wall_speed_y = -wall_speed_y
+        screen.blit(secret, (40, 10))
+
+    if score >= 15 and score < 30:
+        for brick in brick_array:
+            brick.rect = brick.rect.move([wall_speed_x, -wall_speed_y])
+            if brick.rect.left < 0 or brick.rect.right > width:
+                wall_speed_x = -wall_speed_x
+                # tempx = -wall_speed_x
+            if brick.rect.top < 0 or brick.rect.bottom > 400:
+                wall_speed_y = -wall_speed_y
+                # tempy = -wall_speed_y
+        screen.blit(lb_label, (40, 10))
+
+    if score >= 30 and score < 60:
+        for brick in brick_array:
+            brick.rect = brick.rect.move([wall_speed_x, -wall_speed_y])
+            if brick.rect.left < 0 or brick.rect.right > width:
+                wall_speed_x = -wall_speed_x
+            if brick.rect.top < 0 or brick.rect.bottom > 600:
+                wall_speed_y = -wall_speed_y
+        screen.blit(A_label, (40, 10))
+
+    if score >= 60 and score < 65:
+        screen.blit(C_label, (40, 10))
+
+    if score >= 65 and score < 70:
+        ball_speed_y = 7
+        ball_speed_x = 7
+        if ball_rect.top < 0 or ball_rect.bottom > height:
+            ball_speed_y = -ball_speed_y
+        if ball_rect.left < 0 or ball_rect.right > width:
+            ball_speed_x = -ball_speed_x
+        if ball_rect.colliderect(hand.rect):
+            ball_speed_y = -ball_speed_y
+        for brick in brick_array:
+            if brick.rect.colliderect(ball_rect):
+                if ball_rect.top < brick.rect.bottom or ball_rect.bottom > brick.rect.top:
+                    ball_speed_y = - ball_speed_y
+                elif ball_rect.left < brick.rect.right or ball_rect.right > brick.rect.left:
+                    ball_speed_x = - ball_speed_x
+                score = score + 1
+                brick_array.remove(brick)
+        screen.blit(Twist_label, (500, 0))
+
+        # ball_speed_y += 1
+        # ball_speed_x += 1
+
+    # if game_over:
+    #     myfont = pygame.font.SysFont("monospace", 50)
+    #     label = myfont.render("Game over!", 1, (255,255,0))
+    #     screen.blit(label, (300, 320))
+    #     if credits_timer > 0:
+    #         credits_timer -= 1
+    #     else:
+    #         break
+
+    "Labels"
+    secret = myfont.render("Did you catch that?", 1, pygame.color.THECOLORS['white'])
+    score_label = myfont.render(str(score), 1, pygame.color.THECOLORS['white'])
+    lb_label = myfont.render("Looking Good!", 1, pygame.color.THECOLORS['white'])
+    A_label = myfont.render("Amazing!", 1, pygame.color.THECOLORS['white'])
+    everything.clear(screen, empty)
+    C_label = myfont.render("Congratulations! You're basically done", 1, pygame.color.THECOLORS['white'])
+    Twist_label = myfont.render("OR ARE YOU?", 1, pygame.color.THECOLORS['red'])
+
 
     #draw everything on the screen
-    score_label = myfont.render(str(score), 1, pygame.color.THECOLORS['white'])
+    everything.clear(screen, empty)
     screen.blit(score_label, (5, 10))
     for brick in brick_array:
         screen.blit(brick.image, brick.rect)
     screen.blit(ball_img, ball_rect)
-    # pygame.draw.rect(screen, paddle_color, [paddle_x, paddle_y, paddle_width, paddle_height], 0)
-    #update the entire display
+    screen.blit(hand.image, hand.rect)
+    everything.update()
+    everything.draw(screen)
     pygame.display.flip()
 
 
