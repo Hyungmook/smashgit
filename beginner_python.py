@@ -20,7 +20,7 @@ class Background(pygame.sprite.Sprite):
 
 class MasterHand(pygame.sprite.Sprite):
     def __init__(self, hand):
-        self.image = pygame.image.load('hohversion/handopen.png')
+        self.image = pygame.image.load('handopen.png')
         self.handx = 0
         self.handy = 0
         self.rect = self.image.get_rect(midbottom = (500, 750))
@@ -33,7 +33,7 @@ class Brick(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         
         if Brick.image is None:
-                Brick.image = pygame.image.load("hohversion/brick1.png")
+                Brick.image = pygame.image.load("brick1.png")
         self.image = Brick.image
 
         # Make our top-left corner the passed-in location.
@@ -48,7 +48,7 @@ class Brick(pygame.sprite.Sprite):
 #the game's variables
 
 "BACKGROUND"
-background = Background('hohversion/thumbs_up.png', [200,0])
+background = Background('thumbs_up.png', [200,0])
 
 "THE BALL"
 ball_x = 10
@@ -69,14 +69,14 @@ wall_speed_y = 2
 delta_wall_x = 0
 delta_wall_y = 0
 #Attempted to change the brick colors when reach certain point, but decided green is fine
-brick2 = pygame.image.load("hohversion/brick2.png")
+brick2 = pygame.image.load("brick2.png")
 brick2_rect = brick2.get_rect()
-brick3 = pygame.image.load("hohversion/brick3.png")
+brick3 = pygame.image.load("brick3.png")
 brick3_rect = brick3.get_rect()
 
 
 "THE BALL'S JUNK"
-ball_img = pygame.image.load('hohversion/smashball.png').convert()
+ball_img = pygame.image.load('smashball.png').convert()
 ball_trans = ball_img.get_at((0,0))
 ball_img.set_colorkey(ball_trans)
 ball_rect = ball_img.get_rect(center=(500,500))
@@ -99,8 +99,8 @@ pygame.key.set_repeat(20, 20)
 
 credits_timer = 250
 
-theme = "hohversion/3-26-battle-champion-.mp3"
-theme2 = "hohversion/092 Lavender Town.mp3"
+theme = "3-26-battle-champion-.mp3"
+theme2 = "092 Lavender Town.mp3"
 pygame.mixer.pre_init(44100, -16, 2, 2048)
 
 
@@ -169,7 +169,7 @@ while running == True:
 
     if ball_rect.colliderect(hand.rect):
         ball_speed_y = -ball_speed_y
-        pygame.mixer.Sound("hohversion/SSBB_Grab.wav").play()
+        pygame.mixer.Sound("SSBB_Grab.wav").play()
 
 
     for brick in brick_array:
@@ -256,7 +256,7 @@ pygame.mixer.music.play(-1)
 
 while running == False:
     if score == 92:
-        pygame.mixer.Sound("hohversion/fanfare.wav").play()
+        pygame.mixer.Sound("fanfare.wav").play()
     screen.fill(black)
     go_label = myfont.render("Game over! Either way, everyone's a winner at heart. Press TAB to quit", 1, pygame.color.THECOLORS['yellow'])
     screen.blit(background.image, background.rect)
